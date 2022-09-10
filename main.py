@@ -1,8 +1,10 @@
+from multiprocessing.connection import wait
 import discord
 from pathlib import Path
 import os
+from discord import FFmpegPCMAudio
+import asyncio
 
-taunt_number = 0
 
 list_of_taunts = os.listdir(Path('./taunt_files'))
 def find_taunt(taunt_number):
@@ -22,7 +24,9 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
+    taunt_number = None
 
+    #finds taunt number from the message
     if message.content.startswith('Taunt'):
         text_channel = message.channel
         for word in message.content.split():
@@ -33,44 +37,44 @@ async def on_message(message):
                 taunt_number = int(word)               
                 if taunt_number > 32:
                     await text_channel.send('Taunt number exceeds max.')
+                    return
                 if taunt_number < 1:
                     await text_channel.send('Taunt number exceeds min.')
+                    return
                 break
-        if taunt_number != 0:
+
+        #checks if taunt number has been changed and finds the file
+        if taunt_number != None:
             taunt_file = find_taunt(taunt_number)
-            print('{0} has connected to Discord!'.format(client.user))
-            voice_channel = message.author.voice.channel
-            vc = await voice_channel.connect()
+            print(taunt_file)
+ 
+            #checks if message sender is in the voice channel
+            try:
+                voice_channel = message.author.voice.channel
+            except:
+                await text_channel.send('User is not in a channel.')
+                return
+            if voice_channel != None:
+                try:
+                    vc = await voice_channel.connect()
+                    source = FFmpegPCMAudio('taunt_files/'+ taunt_file)
+                    print('taunt_files/'+ taunt_file)
+                    player = vc.play(source)
+                    # disconnect after the player has finished
+                    # disconnect after the player has finished
+                    while vc.is_playing() != True: #Checks if voice is playing
+                        asyncio.sleep(15) #While it's playing it sleeps for 1 second
+                        await vc.disconnect() #if not it disconnects
+                except discord.ClientException:
+                    vc = discord.utils.get(client.voice_clients)
+                    source = FFmpegPCMAudio('taunt_files/'+ taunt_file)
+                    print('taunt_files/'+ taunt_file)
+                    player = vc.play(source)
+                    # disconnect after the player has finished
+                    while vc.is_playing() != True: #Checks if voice is playing
+                        print(vc.is_playing())
+                        asyncio.sleep(15) #While it's playing it sleeps for 1 second
+                        print(vc.is_playing())
+                        await vc.disconnect() #if not it disconnects
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        if taunt_number == 0:
-            await text_channel.send('Please enter a number after "Taunt".')
-        taunt_file = find_taunt(taunt_number)
-
-'''
-        # only play music if user is in a voice channel
-        voice_channel = message.author.voice.channel
-        if voice_channel != None:
-            await client.connect()
-            player = vc.create_ffmpeg_player(taunt_file, after=lambda: print('done'))
-            player.start()
-            # disconnect after the player has finished
-            player.stop()
-            await vc.disconnect()
-        else:
-            await client.channel.send('User is not in a channel.')
-'''
 client.run('MTAxNTYzMzQ0NjQ4NTM3Mjk0OA.Glya3M.MYwL_repVO26msve0V9OwCbPY_4sjte_BipENk')
