@@ -47,7 +47,7 @@ async def on_message(message):
         if taunt_number != None:
             taunt_file = find_taunt(taunt_number)
             print(taunt_file)
- 
+
             #checks if message sender is in the voice channel
             try:
                 voice_channel = message.author.voice.channel
@@ -60,21 +60,14 @@ async def on_message(message):
                     source = FFmpegPCMAudio('taunt_files/'+ taunt_file)
                     print('taunt_files/'+ taunt_file)
                     player = vc.play(source)
-                    # disconnect after the player has finished
-                    # disconnect after the player has finished
-                    while vc.is_playing() != True: #Checks if voice is playing
-                        asyncio.sleep(15) #While it's playing it sleeps for 1 second
-                        await vc.disconnect() #if not it disconnects
+                    await asyncio.sleep(60)
+                    await vc.disconnect() #if not it disconnects
                 except discord.ClientException:
                     vc = discord.utils.get(client.voice_clients)
                     source = FFmpegPCMAudio('taunt_files/'+ taunt_file)
                     print('taunt_files/'+ taunt_file)
                     player = vc.play(source)
-                    # disconnect after the player has finished
-                    while vc.is_playing() != True: #Checks if voice is playing
-                        print(vc.is_playing())
-                        asyncio.sleep(15) #While it's playing it sleeps for 1 second
-                        print(vc.is_playing())
-                        await vc.disconnect() #if not it disconnects
-
+                    await asyncio.sleep(60)
+                    await vc.disconnect() #if not it disconnects
+                    
 client.run('MTAxNTYzMzQ0NjQ4NTM3Mjk0OA.Glya3M.MYwL_repVO26msve0V9OwCbPY_4sjte_BipENk')
