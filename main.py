@@ -4,7 +4,7 @@ from pathlib import Path
 import os
 from discord import FFmpegPCMAudio
 import asyncio
-
+from bot_token import token
 
 list_of_taunts = os.listdir(Path('./taunt_files'))
 def find_taunt(taunt_number):
@@ -35,7 +35,7 @@ async def on_message(message):
                 break
             if word.isnumeric():
                 taunt_number = int(word)               
-                if taunt_number > 32:
+                if taunt_number > 33:
                     await text_channel.send('Taunt number exceeds max.')
                     return
                 if taunt_number < 1:
@@ -69,5 +69,5 @@ async def on_message(message):
                     player = vc.play(source)
                     await asyncio.sleep(60)
                     await vc.disconnect() #if not it disconnects
-                    
-client.run('MTAxNTYzMzQ0NjQ4NTM3Mjk0OA.Glya3M.MYwL_repVO26msve0V9OwCbPY_4sjte_BipENk')
+                
+client.run(token)
